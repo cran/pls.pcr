@@ -1,3 +1,9 @@
+cat("\nThis package has been superseded by the package",
+    "\n'pls', authored by Bjørn-Helge Mevik and Ron Wehrens.",
+    "\nPackage 'pls.pcr' will not be actively supported anymore,",
+    "\nand will eventually be deprecated.\n\n")
+
+
 ### Generic function for PCR and PLS.
 ### Contains preprocessing and crossvalidation material; real
 ### modelling is done in separate functions.
