@@ -20,8 +20,8 @@ pcr.model <- function(X, Y, ncomp, newX)
   if (!is.null(newX))
     list(B=B, Ypred=Ypred,
          Xscores=U[,1:max(ncomp),drop=FALSE],
-         Xload=t(diag(D) %*% Vt)[,1:max(ncomp),drop=FALSE])
+         Xload=t(diag(D, nrow=length(D)) %*% Vt)[,1:max(ncomp),drop=FALSE])
   else
     list(B=B, Xscores=U[,1:max(ncomp),drop=FALSE],
-         Xload=t(diag(D) %*% Vt)[,1:max(ncomp),drop=FALSE])
+         Xload=t(diag(D, nrow=length(D)) %*% Vt)[,1:max(ncomp),drop=FALSE])
 }
