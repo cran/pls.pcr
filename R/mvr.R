@@ -16,7 +16,6 @@ mvr <- function(X, Y, ncomp,
   nvar <- dim(X)[2]
   npred <- dim(Y)[2]
 
-  ncompnames <- paste(ncomp, "LV's")
   objnames <- dimnames(X)[[1]]
   if (is.null(objnames)) objnames <- dimnames(Y)[[1]]
   ### if too many objects, names are a nuisance so dont use the next line
@@ -72,6 +71,7 @@ mvr <- function(X, Y, ncomp,
     else
       warning("Reset maximum number of latent variables to ", max(ncomp))
   }
+  ncompnames <- paste(ncomp, "LV's")
   
   Xm <- scale(X, scale=FALSE)
   Ym <- scale(Y, scale=FALSE)
