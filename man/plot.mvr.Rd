@@ -32,15 +32,15 @@ plot.mvr(x,
   }
 \arguments{
   \item{x}{an MVR object.} 
-  \item{plottype}{Type of plot. (Wow!)}
-  \item{which}{Whether training data (1), validation data (2) or both
+  \item{plottype}{type of plot. (Wow!)}
+  \item{which}{whether training data (1), validation data (2) or both
     (1:2) should be shown in the \code{prediction} mode of this
     function.}
-  \item{nlv}{the number of latent variables (in the \code{coefficients}
-    plotting type, this may be a vector) to be used for the
-    plot. Not relevant for the \code{validation} plotting type. For the
+  \item{nlv}{the number of latent variables to take into account.  For the
     \code{loadings} and \code{scores} plotting types, this should be a
-    vector of length 2, defaulting to c(1, 2).} 
+    vector of length 2, defaulting to c(1, 2). In the
+    \code{coefficients} plotting type, this may be a vector. Not
+    relevant for the \code{validation} plotting type.}
   \item{\dots}{optional arguments for the plotting command.}
 }
 \section{References}{

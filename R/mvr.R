@@ -26,8 +26,13 @@ mvr <- function(X, Y, ncomp,
   validation <- match.arg(validation)
   if (validation == "CV") {
     if (missing(grpsize) & missing(niter)) {
-      niter <- 10
-      grpsize <- nobj %/% niter
+      if (nobj > 20) {
+        niter <- 10
+        grpsize <- nobj %/% niter
+      } else {
+        niter <- nobj
+        grpsoze <- 1
+      }
     } else {
       if (missing(niter))
         niter <- nobj %/% grpsize
@@ -62,18 +67,14 @@ mvr <- function(X, Y, ncomp,
   Xm <- scale(X, scale=FALSE)
   Ym <- scale(Y, scale=FALSE)
   training <- c(modelfun(Xm, Ym, ncomp, Xm),
-                list(RMS = matrix(0, length(ncomp), npred),
-                     R2 = matrix(0, length(ncomp), npred)))
-  dimnames(training$RMS) <- dimnames(training$R2) <-
-    list(paste(ncomp, "LV's"), yvarnames)
+                list(RMS = matrix(0, length(ncomp), npred)))
+  dimnames(training$RMS) <- list(paste(ncomp, "LV's"), yvarnames)
   
   for (i in seq(along=ncomp)) {
     training$Ypred[ , , i] <-
       sweep(training$Ypred[ , , i, drop=FALSE], 2,
             colMeans(Y), FUN = '+')
-    training$RMS[i,] <- apply(Y-training$Ypred[ , , i], 2,
-                              function(x) sqrt(mean(x^2)))
-    training$R2[i,] <- diag(cor(Y, training$Ypred[ , , i]))^2
+    training$RMS[i,] <- sqrt(colMeans((Y-training$Ypred[ , , i])^2))
   }
 
   dimnames(training$XvarExpl) <- list(paste(ncomp, "LV's"), "X")
@@ -125,7 +126,7 @@ mvr <- function(X, Y, ncomp,
     for (i in seq(along=ncomp)) {
       Ydiff <- Y - Ypred[,,i]
       validat$Ypred <- Ypred
-      validat$RMS[i,] <- apply(Ydiff, 2, function(x) sqrt(mean(x^2)))
+      validat$RMS[i,] <- sqrt(colMeans(Ydiff^2))
       validat$RMS.sd[i,] <- apply(Ydiff, 2, sd)/sqrt(nobj)
       validat$R2[i,] <- diag(cor(Y, Ypred[,,i]))^2
     }

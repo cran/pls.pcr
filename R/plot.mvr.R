@@ -19,9 +19,6 @@ plot.mvr <- function(x,
       which = 1
   }
 
-  if (is.null(nlv))
-    nlv <- mvrmodel$ncomp
-  
   switch(plottype,
          validation = {
            if (npred > 1) par(ask = TRUE)
@@ -54,6 +51,11 @@ plot.mvr <- function(x,
            }
          },
          coefficients = {
+           if (is.null(nlv))
+             nlv <- mvrmodel$valid$nLV
+           if (is.null(nlv))
+             nlv <- mvrmodel$ncomp
+  
            if (length(nlv) > 1) {
              nrow <- floor(sqrt(length(nlv)))
              mfrow <- c(nrow, ceiling(length(nlv)/nrow))
@@ -83,7 +85,8 @@ plot.mvr <- function(x,
            
 #         },
          scores = {
-           if (length(nlv) != 2) nlv = 1:2
+           if (is.null(nlv) | length(nlv) != 2) nlv = 1:2
+
            if (mvrmodel$method != "PCR") {
              biplot(mvrmodel$training$Xscores[,nlv],
                     mvrmodel$training$Yscores[,nlv],
@@ -105,7 +108,7 @@ plot.mvr <- function(x,
            }
          },
          loadings = {
-           if (length(nlv) != 2) nlv = 1:2
+           if (is.null(nlv) | length(nlv) != 2) nlv = 1:2
            if (mvrmodel$method != "PCR" && dim(mvrmodel$Y)[[2]] > 1) {
              biplot(mvrmodel$training$Xload[,nlv],
                     mvrmodel$training$Yload[,nlv],
@@ -127,6 +130,11 @@ plot.mvr <- function(x,
            }
          },
          prediction = {
+           if (is.null(nlv))
+             nlv <- mvrmodel$valid$nLV
+           if (is.null(nlv))
+             nlv <- mvrmodel$ncomp
+  
            show <- rep(FALSE, 2)
            if (!is.numeric(which) || any(which < 1) || any(which > 2))
              stop("`which' must be in 1:2")

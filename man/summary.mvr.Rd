@@ -23,7 +23,7 @@
 \examples{
 data(NIR)
 attach(NIR)
-nir.mvr <- mvr(Xtrain,Ytrain,2:8)
+nir.mvr <- mvr(Xtrain, Ytrain, 2:8, valid="CV", grps=1)
 summary(nir.mvr)
 }
 \keyword{regression}

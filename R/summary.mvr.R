@@ -1,8 +1,8 @@
-summary.mvr <- function(object, what=c("all", "training", "validation"), ...)
+summary.mvr <- function(object, what=c("all", "validation", "training"), ...)
 {
   what <- match.arg(what)
-  if (is.null(object$validat))
-    what <- "training"
+  if (what == "all") what <- c("validation", "training")
+  if (is.null(object$validat)) what <- "training"
   
   cat("Data: \tX dimension:", dim(object$X),
       "\n\tY dimension:", dim(object$Y))
@@ -10,25 +10,41 @@ summary.mvr <- function(object, what=c("all", "training", "validation"), ...)
   cat("\nNumber of latent variables considered:",
       ifelse(length(object$ncomp) > 1 & max(diff(object$ncomp) == 1),
              paste(min(object$ncomp), "-", max(object$ncomp), sep=""),
-             object$ncomp), "\n")
-
-  if (what == "all" | what == "training") {
-    cat("\n\nTRAINING:\nRMS table:\n")
-    print(object$training$RMS, format="f", digits=3)
-    
-    cat("\nCumulative fraction of variance explained:\n")
-    varexpl <- cbind(object$training$XvarExpl, object$training$YvarExpl)
-    print(varexpl, format="f", digits=3)
-  }
+             object$ncomp))
+  if ("validation" %in% what)
+    cat("\nSuggested number of latent variables:", object$validat$nLV,
+        "(cross validation)\n")
   
-  if (what == "all" | what == "validation") {
-    cat("\n\nVALIDATION\nOptimal number of latent variables:",
-        object$validat$nLV)
-    cat("\n\nRMS table (",
-        object$validat$niter, "-fold crossvalidation):\n", sep="")
-    print(object$validat$RMS, format="f", digits=3)
-    cat("\nCoefficient of multiple determination (R2):\n")
-    print(object$validat$R2, format="f", digits=2)
-    cat("\n")
+  for (wh in what) {
+    if (wh == "training") {
+      obj <- object$training
+      cat("\n\nTRAINING:\n")
+    } else {
+      obj <- object$validat
+      cat("\n\nVALIDATION:\n")
+    }
+
+    if (wh == "training") {
+      cat("Variance explained (%):\n")
+      tbl <- cbind(obj$XvarExpl*100, obj$YvarExpl*100)
+      print(tbl, format="f", print.gap=3, ...)
+      cat("\nRMS:\n")
+      print(obj$RMS, print.gap=3, ...)
+    } else {
+      for (i in 1:ncol(object$Y)) {
+        cat(dimnames(obj$RMS)[[2]][i],"\n")
+        
+        tbl <- matrix(0, length(object$ncomp), 3)
+        dimnames(tbl) <- list(dimnames(obj$RMS)[[1]],
+                              c("RMS", "sd(RMS)", "Q^2"))
+        tbl[,1] <- obj$RMS[,i]
+        tbl[,2] <- obj$RMS.sd[,i]
+        tbl[,3] <- obj$R2[,i]
+
+        print(tbl, format="f", print.gap=3, ...)
+        cat("\n")
+      }
+    }
   }
 }
+
