@@ -15,8 +15,7 @@ kernelpls <- function(X, Y, ncomp, newX)
   QQ <- matrix(0, ncol=max(ncomp), nrow=npred)# Y loadings
   RR <- matrix(0, ncol=max(ncomp), nrow=nvar)
   B <- array(0, c(dim(X)[2], dim(Y)[2], length(ncomp)))
-  XvarExpl <- rep(0, length(ncomp))
-  YvarExpl <- rep(0, length(ncomp))
+
   if (!is.null(newX))
     Ypred <- array(0, c(dim(newX)[1], npred, length(ncomp)))
                         
@@ -63,15 +62,16 @@ kernelpls <- function(X, Y, ncomp, newX)
   }
 
   XvarExpl <- diag(crossprod(PP)) / (sum(diag(var(X))) * (nobj - 1))
-  YvarExpl <- diag(crossprod(QQ)) / (sum(diag(var(Y))) * (nobj - 1))
+  YvarExpl <- matrix(0, length(ncomp), npred)
+  for (i in 1:max(ncomp))
+    YvarExpl[i,] <- diag(cor(Y, X %*% B[ , , i]))^2
   
   if (!is.null(newX))
     list(B=B, XvarExpl=matrix(cumsum(XvarExpl)[ncomp], ncol=1),
-         YvarExpl=matrix(cumsum(YvarExpl)[ncomp], ncol=1),
-         Ypred=Ypred)
+         YvarExpl=YvarExpl, Ypred=Ypred)
   else
     list(B=B, XvarExpl=matrix(cumsum(XvarExpl)[ncomp], ncol=1),
-         YvarExpl=matrix(cumsum(YvarExpl)[ncomp], ncol=1))
+         YvarExpl=YvarExpl)
 }
 
 

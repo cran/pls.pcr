@@ -5,7 +5,7 @@ plot.mvr <- function(x,
 {
   opar <- par(no.readonly=TRUE)
   on.exit(par(opar))
-
+  
   mvrmodel <- x
   npred <- dim(mvrmodel$Y)[2]
   if (is.null(ynames <- dimnames(mvrmodel$Y)[[2]]))

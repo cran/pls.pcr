@@ -60,14 +60,15 @@ mvr <- function(X, Y, ncomp,
   for (i in seq(along=ncomp)) {
     training$Ypred[ , , i] <-
       sweep(training$Ypred[ , , i, drop=FALSE], 2,
-            apply(Y, 2, mean), FUN = '+')
+            colMeans(Y), FUN = '+')
     training$RMS[i,] <- apply(Y-training$Ypred[ , , i], 2,
                               function(x) sqrt(mean(x^2)))
     training$R2[i,] <- diag(cor(Y, training$Ypred[ , , i]))^2
   }
 
   dimnames(training$XvarExpl) <- list(paste(ncomp, "LV's"), "X")
-  dimnames(training$YvarExpl) <- list(paste(ncomp, "LV's"), "Y")
+  dimnames(training$YvarExpl) <- list(paste(ncomp, "LV's"),
+                                      dimnames(Y)[[2]])
 
   mvrmodel <- list(X=X, Y=Y, ncomp=ncomp, training=training,
                    method=method)
@@ -90,8 +91,8 @@ mvr <- function(X, Y, ncomp,
     for (i in 1:niter) {
       start <- lastone + 1
       end <- lastone + setsizes[i]
-      xmns <- apply(X[-indices[start:end],], 2, mean)
-      ymns <- apply(Y[-indices[start:end],,drop=FALSE], 2, mean)
+      xmns <- colMeans(X[-indices[start:end],])
+      ymns <- colMeans(Y[-indices[start:end],,drop=FALSE])
       Xv <- sweep(X[-indices[start:end],], 2, xmns)
       Xv.test <- sweep(X[indices[start:end],,drop=FALSE], 2, xmns)
       Yv <- sweep(Y[-indices[start:end],,drop=FALSE], 2, ymns)
@@ -110,8 +111,8 @@ mvr <- function(X, Y, ncomp,
       validat$R2[i,] <- diag(cor(Y, Ypred[,,i]))^2
     }
     if (npred > 1) {
-      rmsmat <- apply(validat$RMS, 1, sum)
-      rmsmat.sd <- apply(validat$RMS.sd, 1, sum)
+      rmsmat <- rowSums(validat$RMS)
+      rmsmat.sd <- rowSums(validat$RMS.sd)
       validat$nLV <- ncomp[min(which(rmsmat < min(rmsmat+rmsmat.sd)))]
     } else {
       validat$nLV <-

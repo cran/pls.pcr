@@ -1,6 +1,6 @@
 predict.mvr <- function(object, newX, nlv, ...)
 {
-  X <- sweep(newX, 2, apply(object$X, 2, mean))
+  X <- sweep(newX, 2, colMeans(object$X))
 
   if (length(object$ncomp) == 1) {
     if (!missing(nlv))
@@ -18,5 +18,5 @@ predict.mvr <- function(object, newX, nlv, ...)
 
   index <- which(object$ncomp == nlv)
   sweep(X %*% object$training$B[ , , index, drop=TRUE], 2,
-        apply(object$Y, 2, mean), FUN="+")
+        colMeans(object$Y), FUN="+")
 }
