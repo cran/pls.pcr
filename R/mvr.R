@@ -12,7 +12,6 @@ mvr <- function(X, Y, ncomp,
   if (is.vector(Y))
     Y <- matrix(Y, ncol=1)
   npred <- dim(Y)[2]
-
   
   validation <- match.arg(validation)
   if (validation == "CV") {
@@ -66,11 +65,12 @@ mvr <- function(X, Y, ncomp,
                               function(x) sqrt(mean(x^2)))
     training$R2[i,] <- diag(cor(Y, training$Ypred[ , , i]))^2
   }
-  
+
+  dimnames(training$XvarExpl) <- list(paste(ncomp, "LV's"), "X")
+  dimnames(training$YvarExpl) <- list(paste(ncomp, "LV's"), "Y")
+
   mvrmodel <- list(X=X, Y=Y, ncomp=ncomp, training=training,
                    method=method)
-  dimnames(mvrmodel$training$XvarExpl) <- list(paste(ncomp, "LV's"), "X")
-  dimnames(mvrmodel$training$YvarExpl) <- list(paste(ncomp, "LV's"), "Y")
   
   if (validation == "CV") {
     validat <- list(niter = niter, nLV=-1,

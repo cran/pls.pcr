@@ -32,7 +32,10 @@
       \code{c(nvar, npred, length(ncomp))} with \code{nvar} the number
       of \code{X} variables and \code{npred} the number of variables to be
       predicted in \code{Y}.}
-  \item{XvarExpl}{coeff. of determination (\code{X}).}
+    \item{XvarExpl}{Fraction of X-variance explained.}
+    \item{YvarExpl}{Fraction of Y-variance explained (one column, even
+      for multiple Y).
+      }
   \item{Ypred}{predictions for \code{newX} (if asked).}
 }
 \seealso{

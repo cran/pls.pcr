@@ -53,13 +53,14 @@ simpls <- function(X, Y, ncomp, newX)
 
   XvarExpl <- diag(crossprod(PP)) / (sum(diag(var(X))) * (nobj - 1))
   YvarExpl <- diag(crossprod(QQ)) / (sum(diag(var(Y))) * (nobj - 1))
-
+  
   if (!is.null(newX))
-    list(B=B, XvarExpl=matrix(cumsum(XvarExpl[ncomp]), ncol=1),
-         YvarExpl=matrix(cumsum(YvarExpl[ncomp]), ncol=npred), Ypred=Ypred)
+    list(B=B, XvarExpl=matrix(cumsum(XvarExpl)[ncomp], ncol=1),
+         YvarExpl=matrix(cumsum(YvarExpl)[ncomp], ncol=1),
+         Ypred=Ypred)
   else
-    list(B=B, XvarExpl=matrix(cumsum(XvarExpl[ncomp]), ncol=1),
-         matrix(YvarExpl=cumsum(YvarExpl[ncomp]), ncol=npred))
+    list(B=B, XvarExpl=matrix(cumsum(XvarExpl)[ncomp], ncol=1),
+         YvarExpl=matrix(cumsum(YvarExpl)[ncomp], ncol=1))
 }
 
 

@@ -47,10 +47,15 @@ pls(\dots, method)
       of \code{X} variables and \code{npred} the number of variables to be
       predicted in \code{Y}.
     }
-    \item{Ypred}{predicted values.}
+    \item{Ypred}{predicted values for the training data.}
     \item{RMS}{Root-mean-square error of the training data for all items
       in \code{ncomp}.} 
-    \item{R2}{coefficient of multiple determination for the training data.}
+    \item{R2}{coefficient of multiple determination for the training
+      data.}
+    \item{XvarExpl}{Fraction of X-variance explained.}
+    \item{YvarExpl}{Fraction of Y-variance explained (one column, even
+      for multiple Y).
+      }
     }
     \item{validat}{a list with the following components:
       \item{Ypred}{predicted values.}
@@ -69,10 +74,8 @@ pls(\dots, method)
     }
 }
 \seealso{
-  \code{\link{pcr.model}}
-  \code{\link{simpls}}
-  \code{\link{kernelpls}
-  \code{\link{plot.mvr}}
+  \code{\link{pcr.model}}, \code{\link{simpls}},
+  \code{\link{kernelpls}}, \code{\link{plot.mvr}},
   \code{\link{summary.mvr}}}
 }
 \examples{

@@ -17,6 +17,6 @@ predict.mvr <- function(object, newX, nlv, ...)
   }
 
   index <- which(object$ncomp == nlv)
-  sweep(X %*% object$training$B[ , , index, drop=FALSE], 2,
+  sweep(X %*% object$training$B[ , , index, drop=TRUE], 2,
         apply(object$Y, 2, mean), FUN="+")
 }

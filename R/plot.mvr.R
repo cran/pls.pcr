@@ -7,7 +7,10 @@ plot.mvr <- function(x,
   on.exit(par(opar))
 
   mvrmodel <- x
-
+  npred <- dim(mvrmodel$Y)[2]
+  if (is.null(ynames <- dimnames(mvrmodel$Y)[[2]]))
+    ynames <- ifelse (npred > 1, list(paste("Y", 1:npred)), list("Y"))[[1]]
+  
   plottype <- match.arg(plottype)
   if (is.null(mvrmodel$validat)) {
     if (plottype == "validation")
@@ -18,13 +21,11 @@ plot.mvr <- function(x,
 
   if (is.null(nlv))
     nlv <- mvrmodel$ncomp
-
-  npred <- dim(mvrmodel$Y)[2]
   
   switch(plottype,
          validation = {
            if (npred > 1) par(ask = TRUE)
-
+           
            for (i in 1:npred) {
              x <- mvrmodel$ncomp
              y <- matrix(c(mvrmodel$validat$RMS[,i],
@@ -35,13 +36,14 @@ plot.mvr <- function(x,
                          ncol=3)
              
              matplot(x, y, xlab="# LV's", ylab="CV error",
-                     main=paste(mvrmodel$method, "\n",
-                       mvrmodel$validat$niter, "-fold CV", sep=""),
+                     main=paste(mvrmodel$method, ": ",
+                       ifelse (mvrmodel$validat$niter == dim(mvrmodel$X)[1],
+                               "LOO-CV",
+                               list(paste(mvrmodel$validat$niter, "-fold CV",
+                                          sep=""))[[1]]),
+                       sep=""),
                      type="n", ...)
-             if (npred > 1)
-               mtext(ifelse(is.null(dimnames(mvrmodel$Y)[[2]]),
-                            paste("Y-variable", 1:npred),
-                            dimnames(mvrmodel$Y)[[2]][i]))
+             if (npred > 1) mtext(ynames[i])
              abline(h=min(y[,2]), lty=3)
              abline(v=mvrmodel$validat$nLV, lty=3)
              lines(x, y[,1], col=2)
@@ -52,7 +54,7 @@ plot.mvr <- function(x,
            }
          },
          coefficients = {
-           if (length(nlv > 1)) {
+           if (length(nlv) > 1) {
              nrow <- floor(sqrt(length(nlv)))
              mfrow <- c(nrow, ceiling(length(nlv)/nrow))
              par(mfrow=mfrow)
@@ -61,14 +63,11 @@ plot.mvr <- function(x,
            
            for (i in 1:npred) {
              for (j in seq(along=nlv)) {
-               plot(mvrmodel$training$B[ , i, j], xlab="Variable",
+               plot(mvrmodel$training$B[ , i, nlv[j]], xlab="Variable",
                     ylab="Regression coefficient",
-                    main=paste("Regression vector\n", nlv[j],
+                    main=paste("Regression vector using", nlv[j],
                       "latent variables"), ...)
-               if (npred > 1)
-                 mtext(ifelse(is.null(dimnames(mvrmodel$Y)[[2]]),
-                              paste("Y-variable", 1:npred),
-                              dimnames(mvrmodel$Y)[[2]][i]))
+               if (npred > 1) mtext(ynames[i])
              }
            }
          },
@@ -101,10 +100,7 @@ plot.mvr <- function(x,
                       ylim = range(mvrmodel$Y[,i],
                         mvrmodel$training$Ypred[,i,nlv[j]]),
                       main=paste("Training data\n",nlv[j],"latent variables"))
-                 if (npred > 1)
-                   mtext(ifelse(is.null(dimnames(mvrmodel$Y)[[2]]),
-                                paste("Y-variable", 1:npred),
-                                dimnames(mvrmodel$Y)[[2]][i]))
+                 if (npred > 1) mtext(ynames[i])
                  abline(0, 1, col="blue")
                  points(mvrmodel$Y[,i], mvrmodel$training$Ypred[,i,nlv[j]])
                }
@@ -118,10 +114,7 @@ plot.mvr <- function(x,
                         mvrmodel$validat$Ypred[,i,nlv[j]]),
                       main=paste("Cross-validation data\n",
                         nlv[j],"latent variables"))
-                 if (npred > 1)
-                   mtext(ifelse(is.null(dimnames(mvrmodel$Y)[[2]]),
-                                paste("Y-variable", 1:npred),
-                                dimnames(mvrmodel$Y)[[2]][i]))
+                 if (npred > 1) mtext(ynames[i])
                  abline(0, 1, col="blue")
                  points(mvrmodel$Y[,i], mvrmodel$validat$Ypred[,i,nlv[j]])
                }
