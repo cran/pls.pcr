@@ -41,7 +41,9 @@ plot.mvr(x,
     vector of length 2, defaulting to c(1, 2). In the
     \code{coefficients} plotting type, this may be a vector. Not
     relevant for the \code{validation} plotting type.}
-  \item{\dots}{optional arguments for the plotting command.}
+  \item{\dots}{several other arguments for the plotting command (not
+    all!) can be used, as well. To see which ones, just try or look at
+    the code...}
 }
 \section{References}{
   T. Hastie, R. Tibshirani and J. Friedman, \emph{The elements of
