@@ -1,6 +1,6 @@
+NIR                     Multivariate dataset of NIR spectra
 kernelpls               Kernel PLS (Dayal and MacGregor)
 mvr                     Multivariate Regression
-NIR                     Multivariate dataset of NIR spectra
 pcr.model               PCR model building
 plot.mvr                Plot a MVR object
 predict.mvr             MVR predictions

@@ -134,10 +134,15 @@ plot.mvr <- function(x,
              nlv <- mvrmodel$ncomp
   
            show <- rep(FALSE, 2)
+           ### which == 1: show predictions of training set
+           ### which == 2: show crossvalidation predictions
+           ### which == c(1,2): show both
            if (!is.numeric(which) || any(which < 1) || any(which > 2))
              stop("`which' must be in 1:2")
            show[which] <- TRUE
            if (length(which)>1) {
+             ## show at most three rows of two plots
+             ## if both training and validation plots are required
              if (length(nlv) > 3) {
                par("ask" = TRUE)
                par(mfrow = c(3,2))
@@ -147,12 +152,14 @@ plot.mvr <- function(x,
                par(mfrow = c(length(nlv),2))
              }
            } else {
+             ## if only validation or training plots, then cram
+             ## everything into one screen
              if (length(nlv)> 1) {
                nrow <- floor(sqrt(length(nlv)))
                mfrow <- c(nrow, ceiling(length(nlv)/nrow))
                par(mfrow=mfrow)
-               nScreens <- 1
              }
+             nScreens <- 1
            }
          
            if (npred > 1)
@@ -160,11 +167,18 @@ plot.mvr <- function(x,
            par(pty="s")
            
            for (i in 1:npred) {
-             whatnlv <- 1
+             allindices <- match(nlv, mvrmodel$ncomp)
+             if (any(is.na(allindices)))
+               stop(paste("Incorrect number of LVs; should be a subset of",
+                          paste(mvrmodel$ncomp, collapse=", ")))
              for (k in 1:nScreens) {
-               if (nScreens == 1) indices <- 1:length(nlv)
-               else indices <- (k-1)*3 + 1:3
-               indices <- indices[indices <= length(nlv)]
+               if (nScreens == 1) {
+                 indices <- allindices
+               } else {
+                 cnts <- (k-1)*3 + 1:3
+                 cnts <- cnts[cnts <= length(nlv)]
+                 indices <- allindices[cnts]
+               }
                for (j in indices) {
                  if (show[1]) {
                    plot(mvrmodel$Y[,i], mvrmodel$training$Ypred[,i,j],
@@ -174,7 +188,7 @@ plot.mvr <- function(x,
                         ylim = range(mvrmodel$Y[,i],
                           mvrmodel$training$Ypred[,i,j]),
                         main=paste("Training data\n",
-                          nlv[j],"latent variables"))
+                          dimnames(mvrmodel$training$Ypred)[[3]][j]))
                    if (npred > 1) mtext(ynames[i])
                    abline(0, 1, col="blue")
                    points(mvrmodel$Y[,i], mvrmodel$training$Ypred[,i,j])
@@ -188,7 +202,7 @@ plot.mvr <- function(x,
                         ylim=range(mvrmodel$Y[,i],
                           mvrmodel$validat$Ypred[,i,j]),
                         main=paste("Cross-validation data\n",
-                          nlv[j],"latent variables"))
+                          dimnames(mvrmodel$validat$Ypred)[[3]][j]))
                    if (npred > 1) mtext(ynames[i])
                    abline(0, 1, col="blue")
                    points(mvrmodel$Y[,i], mvrmodel$validat$Ypred[,i,j])
