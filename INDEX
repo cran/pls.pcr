@@ -1,0 +1,9 @@
+NIR                     Multivariate dataset of NIR spectra
+kernelpls               Kernel PLS (Dayal and MacGregor)
+linnerud                Multivariate dataset for PCR
+mvr                     Multivariate Regression
+pcr.model               PCR model building
+plot.mvr                Plot a MVR object
+predict.mvr             MVR predictions
+simpls                  De Jong's SIMPLS
+summary.mvr             Summary of a MVR object
