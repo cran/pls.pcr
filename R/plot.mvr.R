@@ -7,9 +7,8 @@ plot.mvr <- function(x,
   on.exit(par(opar))
   
   mvrmodel <- x
-  npred <- dim(mvrmodel$Y)[2]
-  if (is.null(ynames <- dimnames(mvrmodel$Y)[[2]]))
-    ynames <- ifelse (npred > 1, list(paste("Y", 1:npred)), list("Y"))[[1]]
+  npred <- mvrmodel$npred
+  ynames <- dimnames(mvrmodel$Y)[[2]]
   
   plottype <- match.arg(plottype)
   if (is.null(mvrmodel$validat)) {
@@ -34,7 +33,7 @@ plot.mvr <- function(x,
              
              matplot(x, y, xlab="# LV's", ylab="CV error",
                      main=paste(mvrmodel$method, ": ",
-                       ifelse (mvrmodel$validat$niter == dim(mvrmodel$X)[1],
+                       ifelse (mvrmodel$validat$niter == mvrmodel$nobj,
                                "LOO-CV",
                                list(paste(mvrmodel$validat$niter, "-fold CV",
                                           sep=""))[[1]]),
@@ -75,15 +74,14 @@ plot.mvr <- function(x,
              }
            }
          },
-#         inner = {
-#           if (length(nlv) > 1) {
-#             nrow <- floor(sqrt(length(nlv)))
-#             mfrow <- c(nrow, ceiling(length(nlv)/nrow))
-#             par(mfrow=mfrow)
-#           }
-#           if (npred > 1) par(ask = TRUE)
-           
-#         },
+###         inner = {
+###           if (length(nlv) > 1) {
+###             nrow <- floor(sqrt(length(nlv)))
+###             mfrow <- c(nrow, ceiling(length(nlv)/nrow))
+###             par(mfrow=mfrow)
+###           }
+###           if (npred > 1) par(ask = TRUE)
+###         },
          scores = {
            if (is.null(nlv) | length(nlv) != 2) nlv = 1:2
 
@@ -100,8 +98,8 @@ plot.mvr <- function(x,
                   xlab=paste("LV", nlv[1]),
                   ylab=paste("LV", nlv[2]), type="n", ...)
              abline(h=0, v=0, col="gray")
-             labs <- dimnames(mvrmodel$X)[[1]]
-             if (is.null(labs)) labs <- 1:nrow(mvrmodel$X)
+             labs <- dimnames(mvrmodel$Xscores)[[1]]
+             if (is.null(labs)) labs <- 1:mvrmodel$nobj
              text(mvrmodel$training$Xscores[,nlv[1]],
                   mvrmodel$training$Xscores[,nlv[2]],
                   labs)
@@ -109,7 +107,7 @@ plot.mvr <- function(x,
          },
          loadings = {
            if (is.null(nlv) | length(nlv) != 2) nlv = 1:2
-           if (mvrmodel$method != "PCR" && dim(mvrmodel$Y)[[2]] > 1) {
+           if (mvrmodel$method != "PCR" && mvrmodel$npred > 1) {
              biplot(mvrmodel$training$Xload[,nlv],
                     mvrmodel$training$Yload[,nlv],
                     var.axes=FALSE, main="Loadings",
@@ -122,8 +120,8 @@ plot.mvr <- function(x,
                   xlab=paste("LV", nlv[1]),
                   ylab=paste("LV", nlv[2]), type="n", ...)
              abline(h=0, v=0, col="gray")
-             labs <- dimnames(mvrmodel$X)[[2]]
-             if (is.null(labs)) labs <- 1:nrow(mvrmodel$X)
+             labs <- dimnames(mvrmodel$Xload)[[1]]
+             if (is.null(labs)) labs <- 1:mvrmodel$nobj
              text(mvrmodel$training$Xload[,nlv[1]],
                   mvrmodel$training$Xload[,nlv[2]],
                   labs)

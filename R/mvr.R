@@ -15,14 +15,23 @@ mvr <- function(X, Y, ncomp,
   nobj <- dim(X)[1]
   nvar <- dim(X)[2]
   npred <- dim(Y)[2]
+
+  ncompnames <- paste(ncomp, "LV's")
   objnames <- dimnames(X)[[1]]
   if (is.null(objnames)) objnames <- dimnames(Y)[[1]]
-  if (is.null(objnames)) objnames <- paste("obj", 1:nobj, sep=".")
+  ### if too many objects, names are a nuisance so dont use the next line
+  ##  if (is.null(objnames)) objnames <- paste("obj", 1:nobj, sep=".")
   xvarnames <- dimnames(X)[[2]]
-  if (is.null(xvarnames)) xvarnames <- paste("X", 1:nvar, sep=".")
+  ### if too many variables, names are a nuisance too
+  ##  if (is.null(xvarnames)) xvarnames <- paste("X", 1:nvar, sep=".")
   yvarnames <- dimnames(Y)[[2]]
-  if (is.null(yvarnames)) yvarnames <- paste("Y", 1:npred, sep=".")
-  
+  ## not often that you have too many Y variables...
+  if (is.null(yvarnames))
+    yvarnames <- ifelse (npred > 1,
+                         paste("Y", 1:npred, sep="."),
+                         "Y")
+  dimnames(X) <- dimnames(Y) <- NULL
+
   validation <- match.arg(validation)
   if (validation == "CV") {
     if (missing(grpsize) & missing(niter)) {
@@ -31,7 +40,7 @@ mvr <- function(X, Y, ncomp,
         grpsize <- nobj %/% niter
       } else {
         niter <- nobj
-        grpsoze <- 1
+        grpsize <- 1
       }
     } else {
       if (missing(niter))
@@ -68,8 +77,7 @@ mvr <- function(X, Y, ncomp,
   Ym <- scale(Y, scale=FALSE)
   training <- c(modelfun(Xm, Ym, ncomp, Xm),
                 list(RMS = matrix(0, length(ncomp), npred)))
-  dimnames(training$RMS) <- list(paste(ncomp, "LV's"), yvarnames)
-  
+    
   for (i in seq(along=ncomp)) {
     training$Ypred[ , , i] <-
       sweep(training$Ypred[ , , i, drop=FALSE], 2,
@@ -77,9 +85,8 @@ mvr <- function(X, Y, ncomp,
     training$RMS[i,] <- sqrt(colMeans((Y-training$Ypred[ , , i])^2))
   }
 
-  dimnames(training$XvarExpl) <- list(paste(ncomp, "LV's"), "X")
-  dimnames(training$YvarExpl) <- list(paste(ncomp, "LV's"),
-                                      yvarnames)
+  ## Not ncompnames here, since all scores and loadings from 1:max(ncomp)
+  ## are calculated and stored, not only for those numbers in vector ncomp.
   dimnames(training$Xscores) <- list(objnames,
                                      paste("LV", 1:max(ncomp)))
   dimnames(training$Xload) <- list(xvarnames,
@@ -90,16 +97,22 @@ mvr <- function(X, Y, ncomp,
     dimnames(training$Yload) <- list(yvarnames,
                                      paste("LV", 1:max(ncomp)))
   }
-  mvrmodel <- list(X=X, Y=Y, ncomp=ncomp, training=training,
-                   method=method)
+  dimnames(training$RMS) <- list(ncompnames, yvarnames)
+  dimnames(training$Ypred) <- list(objnames, yvarnames, ncompnames)
+  dimnames(Y) <- list(objnames, yvarnames)
+  
+  mvrmodel <- list(nobj=nobj, nvar=nvar, npred=npred, ncomp=ncomp,
+                   Y = Y, Xmeans=attr(Xm, "scaled:center"),
+                   Xss = ifelse(nobj<nvar,
+                     sum(apply(Xm, 1, crossprod)),
+                     sum(apply(Xm, 2, crossprod))),
+                   training=training, method=method)
   
   if (validation == "CV") {
     validat <- list(niter = niter, nLV=-1,
                     RMS = matrix(0, length(ncomp), npred),
                     RMS.sd = matrix(0, length(ncomp), npred),
                     R2 = matrix(0, length(ncomp), npred))
-    dimnames(validat$RMS) <- dimnames(validat$R2) <-
-      list(paste(ncomp, "LV's"), yvarnames)
     
     Ypred <- array(0, c(nobj, npred, length(ncomp)))
     indices <- sample(1:nobj)
@@ -125,7 +138,6 @@ mvr <- function(X, Y, ncomp,
     
     for (i in seq(along=ncomp)) {
       Ydiff <- Y - Ypred[,,i]
-      validat$Ypred <- Ypred
       validat$RMS[i,] <- sqrt(colMeans(Ydiff^2))
       validat$RMS.sd[i,] <- apply(Ydiff, 2, sd)/sqrt(nobj)
       validat$R2[i,] <- diag(cor(Y, Ypred[,,i]))^2
@@ -139,6 +151,10 @@ mvr <- function(X, Y, ncomp,
         ncomp[min(which(validat$RMS < min(validat$RMS + validat$RMS.sd)))]
     }
     
+    dimnames(validat$RMS) <- dimnames(validat$RMS.sd) <-
+      dimnames(validat$R2) <- list(ncompnames, yvarnames)
+    dimnames(Ypred) <- dimnames(mvrmodel$training$Ypred)
+    validat$Ypred <- Ypred
     mvrmodel <- c(mvrmodel, list(validat=validat))
   }
 

@@ -1,6 +1,6 @@
 predict.mvr <- function(object, newX, nlv, ...)
 {
-  X <- sweep(newX, 2, colMeans(object$X))
+  X <- sweep(newX, 2, object$Xmeans)
 
   if (length(object$ncomp) == 1) {
     if (!missing(nlv))

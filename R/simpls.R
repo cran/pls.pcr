@@ -52,20 +52,10 @@ simpls <- function(X, Y, ncomp, newX=NULL)
     }
   }
 
-  XvarExpl <- diag(crossprod(PP)) / (sum(diag(var(X))) * (nobj - 1))
-#  totalYvarExpl <- diag(crossprod(QQ)) / (sum(diag(var(Y))) * (nobj - 1))
-  YvarExpl <- matrix(0, length(ncomp), npred)
-  for (i in 1:length(ncomp))
-    YvarExpl[i,] <- diag(cor(Y, X %*% B[ , , i]))^2
-      
   if (!is.null(newX))
-    list(B=B, XvarExpl=matrix(cumsum(XvarExpl)[ncomp], ncol=1),
-         YvarExpl=YvarExpl, Ypred=Ypred, Xload=PP, Yload=QQ,
-         Xscores=TT, Yscores=UU)
+    list(B=B, Ypred=Ypred, Xload=PP, Yload=QQ, Xscores=TT, Yscores=UU)
   else
-    list(B=B, XvarExpl=matrix(cumsum(XvarExpl)[ncomp], ncol=1),
-         YvarExpl=YvarExpl, Xload=PP, Yload=QQ,
-         Xscores=TT, Yscores=UU)
+    list(B=B, Xload=PP, Yload=QQ, Xscores=TT, Yscores=UU)
 }
 
 

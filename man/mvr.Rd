@@ -34,12 +34,17 @@ pls(\dots, method)
 }
 \value{An object of class \code{mvr} is returned. This has the following
   components:
-  \item{X}{original X data matrix.}
+  \item{nobj}{the number of objects, viz. the number of rows in X and
+    Y.}
+  \item{nvar}{the number of independent variables, viz. the number of
+    columns in X.}
+  \item{npred}{the number of Y variables.}
+  \item{Xmeans}{column means of original X data matrix.}
   \item{Y}{original Y data. Y is represented as a matrix, possibly with
     only one column.}
   \item{ncomp}{the number of latent variables considered in the PCR
     regression.}
-  \item{method}{the method used.}
+  \item{method}{the regression method used.}
   \item{training}{a list with the following components:
     \item{B}{an array of regression coefficients for all items in
       \code{ncomp}. The dimensions of \code{B} are
@@ -52,32 +57,28 @@ pls(\dots, method)
       in \code{ncomp}.} 
     \item{R2}{coefficient of multiple determination for the training
       data.}
-    \item{XvarExpl}{Fraction of X-variance explained.}
-    \item{YvarExpl}{Fraction of Y-variance explained (one column, even
-      for multiple Y).
-    }
     \item{Xscores}{X-scores for objects.}
     \item{Xload}{X-loadings for objects.}
     \item{Yscores}{Y-scores for objects: only in case of a PLS model
       with more than one Y variable.}
     \item{Yload}{Y-loadings for objects: only in case of a PLS model
       with more than one Y variable.}
+  }
+  \item{validat}{a list with the following components:
+    \item{Ypred}{predicted values for the validation stage.}
+    \item{nLV}{number of latent variables suggested by
+      cross-validation. The least complex model within one standard
+      error of the best is chosen.
     }
-    \item{validat}{a list with the following components:
-      \item{Ypred}{predicted values.}
-      \item{nLV}{number of latent variables suggested by
-	cross-validation. The least complex model within one standard
-	error of the best is chosen.
-      }
-      \item{niter}{the number of groups in the cross-validation. If this
-	number equals the number of objects, this is leave-one-out
-	validation.}
-      \item{RMS}{Root-mean-square error from cross-validation for all items
-	in \code{ncomp}.} 
-      \item{RMS.sd}{standard error of the root-mean-square estimate.} 
-      \item{R2}{coefficient of multiple determination from
-	cross-validation.}
-    }
+    \item{niter}{the number of groups in the cross-validation. If this
+      number equals the number of objects, this is leave-one-out
+      validation.}
+    \item{RMS}{Root-mean-square error from cross-validation for all items
+      in \code{ncomp}.} 
+    \item{RMS.sd}{standard error of the root-mean-square estimate.} 
+    \item{R2}{coefficient of multiple determination from
+      cross-validation.}
+  }
 }
 \seealso{
   \code{\link{pcr.model}}, \code{\link{simpls}},

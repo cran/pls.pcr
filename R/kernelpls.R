@@ -10,7 +10,6 @@ kernelpls <- function(X, Y, ncomp, newX)
   nvar <- dim(X)[2]
   npred <- dim(Y)[2]
   
-  ## WW <- matrix(0, ncol=max(ncomp), nrow=nvar) # X weights
   PP <- matrix(0, ncol=max(ncomp), nrow=nvar) # X loadings
   QQ <- matrix(0, ncol=max(ncomp), nrow=npred)# Y loadings
   TT <- matrix(0, ncol=max(ncomp), nrow=nobj)
@@ -52,7 +51,6 @@ kernelpls <- function(X, Y, ncomp, newX)
     XtY <- XtY - (pp %*% qq)
     
     ## store weights and loadings
-    ## WW[,a] <- ww 
     TT[,a] <- tt
     PP[,a] <- pp 
     QQ[,a] <- qq
@@ -66,18 +64,10 @@ kernelpls <- function(X, Y, ncomp, newX)
     }
   }
 
-  XvarExpl <- diag(crossprod(PP)) / (sum(diag(var(X))) * (nobj - 1))
-  YvarExpl <- matrix(0, length(ncomp), npred)
-  for (i in 1:length(ncomp))
-    YvarExpl[i,] <- diag(cor(Y, X %*% B[ , , i]))^2
-  
   if (!is.null(newX))
-    list(B=B, XvarExpl=matrix(cumsum(XvarExpl)[ncomp], ncol=1),
-         YvarExpl=YvarExpl, Ypred=Ypred, Xscores=TT, Xload=PP,
-         Yload=QQ, Yscores=UU)
+    list(B=B, Ypred=Ypred, Xscores=TT, Xload=PP, Yload=QQ, Yscores=UU)
   else
-    list(B=B, XvarExpl=matrix(cumsum(XvarExpl)[ncomp], ncol=1),
-         YvarExpl=YvarExpl, Xload=PP, Yload=QQ, Xscores=TT, Yscores=UU)
+    list(B=B, Xload=PP, Yload=QQ, Xscores=TT, Yscores=UU)
 }
 
 
