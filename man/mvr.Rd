@@ -4,7 +4,7 @@
 \alias{pls}
 \title{Multivariate Regression}
 \usage{
-mvr(X, Y, ncomp=1:min(nobj, nvar),
+mvr(X, Y, ncomp,
     method=c("PCR", "SIMPLS", "kernelPLS"),
     validation=c("none","CV"), grpsize, niter)
 pcr(\dots)

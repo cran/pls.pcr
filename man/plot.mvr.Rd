@@ -3,8 +3,8 @@
 \title{Plot a MVR object}
 \usage{
 plot.mvr(x,
-         plottype=c("validation", "prediction", "coefficients",
-                    "loadings", "scores"),
+         plottype=c("prediction", "validation", "coefficients",
+                    "scores", "loadings"),
          nlv, which=1:2, \dots)
 }
 \description{Several different ways of plotting a \code{mvr} object are
@@ -51,9 +51,9 @@ plot.mvr(x,
 data(NIR)
 attach(NIR)
 nir.pcr <- pcr(Xtrain,Ytrain,1:9, validat="CV")
-plot(nir.pcr)
+\dontrun{plot(nir.pcr)}
 plot(nir.pcr, "coefficients", nlv=3:6, type="l")
-plot(nir.pcr, "prediction", nlv=3:6)
+\dontrun{plot(nir.pcr, "prediction", nlv=3:6)}
 plot(nir.pcr, "prediction", nlv=3:6, which=2)
 
 data(sensory)

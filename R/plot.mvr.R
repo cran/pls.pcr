@@ -1,8 +1,7 @@
 plot.mvr <- function(x,
                      plottype=c("prediction", "validation",
                        "coefficients", "scores", "loadings"),
-                     nlv=mvrmodel$validat$nLV,
-                     which=1:2, ...)
+                     nlv=NULL, which=1:2, ...)
 {
   opar <- par(no.readonly=TRUE)
   on.exit(par(opar))
@@ -64,8 +63,9 @@ plot.mvr <- function(x,
            
            for (i in 1:npred) {
              for (j in seq(along=nlv)) {
-               plot(mvrmodel$training$B[ , i, j], xlab="Variable",
-                    ylab="Regression coefficient",
+               plot(mvrmodel$training$B[ , i,
+                                        which(mvrmodel$ncomp == nlv[j])],
+                    xlab="Variable", ylab="Regression coefficient",
                     main=paste("Regression vector using", nlv[j],
                       "latent variables"), ...)
                abline(h=0, col="gray")
@@ -132,12 +132,20 @@ plot.mvr <- function(x,
              stop("`which' must be in 1:2")
            show[which] <- TRUE
            if (length(which)>1) {
-             par(mfrow = c(length(nlv),2))
+             if (length(nlv) > 3) {
+               par("ask" = TRUE)
+               par(mfrow = c(3,2))
+               nScreens <- ceiling(length(nlv) / 3)
+             } else {
+               nScreens <- 1
+               par(mfrow = c(length(nlv),2))
+             }
            } else {
              if (length(nlv)> 1) {
                nrow <- floor(sqrt(length(nlv)))
                mfrow <- c(nrow, ceiling(length(nlv)/nrow))
                par(mfrow=mfrow)
+               nScreens <- 1
              }
            }
          
@@ -146,32 +154,39 @@ plot.mvr <- function(x,
            par(pty="s")
            
            for (i in 1:npred) {
-             for (j in seq(along=nlv)) {
-               if (show[1]) {
-                 plot(mvrmodel$Y[,i], mvrmodel$training$Ypred[,i,j],
-                      xlab = "Measured", ylab = "Predicted", type = "n",
-                      xlim = range(mvrmodel$Y[,i],
-                        mvrmodel$training$Ypred[,i,j]),
-                      ylim = range(mvrmodel$Y[,i],
-                        mvrmodel$training$Ypred[,i,j]),
-                      main=paste("Training data\n",nlv[j],"latent variables"))
-                 if (npred > 1) mtext(ynames[i])
-                 abline(0, 1, col="blue")
-                 points(mvrmodel$Y[,i], mvrmodel$training$Ypred[,i,j])
-               }
-               
-               if (show[2]) {
-                 plot(mvrmodel$Y[,i], mvrmodel$validat$Ypred[,i,j],
-                      xlab="Measured", ylab="Predicted", type="n",
-                      xlim=range(mvrmodel$Y[,i],
-                        mvrmodel$validat$Ypred[,i,j]),
-                      ylim=range(mvrmodel$Y[,i],
-                        mvrmodel$validat$Ypred[,i,j]),
-                      main=paste("Cross-validation data\n",
-                        nlv[j],"latent variables"))
-                 if (npred > 1) mtext(ynames[i])
-                 abline(0, 1, col="blue")
-                 points(mvrmodel$Y[,i], mvrmodel$validat$Ypred[,i,j])
+             whatnlv <- 1
+             for (k in 1:nScreens) {
+               if (nScreens == 1) indices <- 1:length(nlv)
+               else indices <- (k-1)*3 + 1:3
+               indices <- indices[indices <= length(nlv)]
+               for (j in indices) {
+                 if (show[1]) {
+                   plot(mvrmodel$Y[,i], mvrmodel$training$Ypred[,i,j],
+                        xlab = "Measured", ylab = "Predicted", type = "n",
+                        xlim = range(mvrmodel$Y[,i],
+                          mvrmodel$training$Ypred[,i,j]),
+                        ylim = range(mvrmodel$Y[,i],
+                          mvrmodel$training$Ypred[,i,j]),
+                        main=paste("Training data\n",
+                          nlv[j],"latent variables"))
+                   if (npred > 1) mtext(ynames[i])
+                   abline(0, 1, col="blue")
+                   points(mvrmodel$Y[,i], mvrmodel$training$Ypred[,i,j])
+                 }
+                 
+                 if (show[2]) {
+                   plot(mvrmodel$Y[,i], mvrmodel$validat$Ypred[,i,j],
+                        xlab="Measured", ylab="Predicted", type="n",
+                        xlim=range(mvrmodel$Y[,i],
+                          mvrmodel$validat$Ypred[,i,j]),
+                        ylim=range(mvrmodel$Y[,i],
+                          mvrmodel$validat$Ypred[,i,j]),
+                        main=paste("Cross-validation data\n",
+                          nlv[j],"latent variables"))
+                   if (npred > 1) mtext(ynames[i])
+                   abline(0, 1, col="blue")
+                   points(mvrmodel$Y[,i], mvrmodel$validat$Ypred[,i,j])
+                 }
                }
              }
            }
