@@ -23,8 +23,11 @@ pcr.model <- function(X, Y, ncomp, newX)
 
   if (!is.null(newX))
     list(B=B, XvarExpl=matrix(cumsum(D^2)[ncomp]/sum(huhn$d^2), ncol=1),
-         YvarExpl=yve, Ypred=Ypred)
+         YvarExpl=yve, Ypred=Ypred,
+         Xscores=U[,1:max(ncomp),drop=FALSE],
+         Xload=t(diag(D) %*% Vt)[,1:max(ncomp),drop=FALSE])
   else
     list(B=B, XvarExpl=matrix(cumsum(D^2)[ncomp]/sum(huhn$d^2), ncol=1),
-         YvarExpl=yve)
+         YvarExpl=yve, Xscores=U[,1:max(ncomp),drop=FALSE],
+         Xload=t(diag(D) %*% Vt)[,1:max(ncomp),drop=FALSE])
 }

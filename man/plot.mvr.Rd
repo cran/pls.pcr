@@ -3,7 +3,8 @@
 \title{Plot a MVR object}
 \usage{
 plot.mvr(x,
-         plottype=c("validation", "prediction", "coefficients"),
+         plottype=c("validation", "prediction", "coefficients",
+                    "loadings", "scores"),
          nlv, which=1:2, \dots)
 }
 \description{Several different ways of plotting a \code{mvr} object are
@@ -17,6 +18,15 @@ plot.mvr(x,
     available, both training and validation plots are shown.
     For each Y variable separate plots are made.
   }
+  \item{\code{type="loadings"}}{Shows a plot of loadings for X, in the
+    case of a PCR or PLS1 model, and in the case of a PLS2
+    model shows a biplot of loadings for X and Y. Loadings for Y are
+    indicated in red.}
+  \item{\code{type="scores"}}{Shows a plot of scores for X, in the
+    case of a PCR model, and in the case of a PLS model shows a
+    biplot of scores for X and Y. Scores for Y are
+    indicated in red. In some cases, it may be necessary to scale scores
+    before a meaningful plot is obtained.}
   \item{\code{type="coefficients"}}{Shows regression vector for the
     selected number of latent variables.}
   }
@@ -28,7 +38,9 @@ plot.mvr(x,
     function.}
   \item{nlv}{the number of latent variables (in the \code{coefficients}
     plotting type, this may be a vector) to be used for the
-    plot. Not relevant for the \code{validation} plotting type.} 
+    plot. Not relevant for the \code{validation} plotting type. For the
+    \code{loadings} and \code{scores} plotting types, this should be a
+    vector of length 2, defaulting to c(1, 2).} 
   \item{\dots}{optional arguments for the plotting command.}
 }
 \section{References}{
@@ -43,5 +55,12 @@ plot(nir.pcr)
 plot(nir.pcr, "coefficients", nlv=3:6, type="l")
 plot(nir.pcr, "prediction", nlv=3:6)
 plot(nir.pcr, "prediction", nlv=3:6, which=2)
+
+data(sensory)
+Pn <- scale(sensory$Panel)
+Ql <- scale(sensory$Quality)
+sens.simpls <- mvr(Ql, Pn, 1:5, method="SIMPLS")
+plot(sens.simpls, "loadings")
+plot(sens.simpls, "scores")
 }
 \keyword{regression}

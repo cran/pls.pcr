@@ -1,5 +1,6 @@
 plot.mvr <- function(x,
-                     plottype=c("prediction", "validation", "coefficients"),
+                     plottype=c("prediction", "validation",
+                       "coefficients", "scores", "loadings"),
                      nlv=mvrmodel$validat$nLV,
                      which=1:2, ...)
 {
@@ -63,12 +64,66 @@ plot.mvr <- function(x,
            
            for (i in 1:npred) {
              for (j in seq(along=nlv)) {
-               plot(mvrmodel$training$B[ , i, nlv[j]], xlab="Variable",
+               plot(mvrmodel$training$B[ , i, j], xlab="Variable",
                     ylab="Regression coefficient",
                     main=paste("Regression vector using", nlv[j],
                       "latent variables"), ...)
+               abline(h=0, col="gray")
                if (npred > 1) mtext(ynames[i])
              }
+           }
+         },
+#         inner = {
+#           if (length(nlv) > 1) {
+#             nrow <- floor(sqrt(length(nlv)))
+#             mfrow <- c(nrow, ceiling(length(nlv)/nrow))
+#             par(mfrow=mfrow)
+#           }
+#           if (npred > 1) par(ask = TRUE)
+           
+#         },
+         scores = {
+           if (length(nlv) != 2) nlv = 1:2
+           if (mvrmodel$method != "PCR") {
+             biplot(mvrmodel$training$Xscores[,nlv],
+                    mvrmodel$training$Yscores[,nlv],
+                    var.axes=FALSE, main="Scores",
+                    xlab=paste("LV", nlv[1]),
+                    ylab=paste("LV", nlv[2]), ...)
+             abline(h=0, v=0, col="gray")
+           } else { # only X scores
+             plot(mvrmodel$training$Xscores[,nlv],
+                  main="Scores",
+                  xlab=paste("LV", nlv[1]),
+                  ylab=paste("LV", nlv[2]), type="n", ...)
+             abline(h=0, v=0, col="gray")
+             labs <- dimnames(mvrmodel$X)[[1]]
+             if (is.null(labs)) labs <- 1:nrow(mvrmodel$X)
+             text(mvrmodel$training$Xscores[,nlv[1]],
+                  mvrmodel$training$Xscores[,nlv[2]],
+                  labs)
+           }
+         },
+         loadings = {
+           if (length(nlv) != 2) nlv = 1:2
+           if (mvrmodel$method != "PCR" && dim(mvrmodel$Y)[[2]] > 1) {
+             biplot(mvrmodel$training$Xload[,nlv],
+                    mvrmodel$training$Yload[,nlv],
+                    var.axes=FALSE, main="Loadings",
+                    xlab=paste("LV", nlv[1]),
+                    ylab=paste("LV", nlv[2]), ...)
+             abline(h=0, v=0, col="gray")
+           } else { # only X loadings
+             plot(mvrmodel$training$Xload[,nlv],
+                  main="Loadings",
+                  xlab=paste("LV", nlv[1]),
+                  ylab=paste("LV", nlv[2]), type="n", ...)
+             abline(h=0, v=0, col="gray")
+             labs <- dimnames(mvrmodel$X)[[2]]
+             if (is.null(labs)) labs <- 1:nrow(mvrmodel$X)
+             text(mvrmodel$training$Xload[,nlv[1]],
+                  mvrmodel$training$Xload[,nlv[2]],
+                  labs)
            }
          },
          prediction = {
@@ -85,7 +140,7 @@ plot.mvr <- function(x,
                par(mfrow=mfrow)
              }
            }
-          
+         
            if (npred > 1)
              par(ask = TRUE )
            par(pty="s")
@@ -93,30 +148,30 @@ plot.mvr <- function(x,
            for (i in 1:npred) {
              for (j in seq(along=nlv)) {
                if (show[1]) {
-                 plot(mvrmodel$Y[,i], mvrmodel$training$Ypred[,i,nlv[j]],
+                 plot(mvrmodel$Y[,i], mvrmodel$training$Ypred[,i,j],
                       xlab = "Measured", ylab = "Predicted", type = "n",
                       xlim = range(mvrmodel$Y[,i],
-                        mvrmodel$training$Ypred[,i,nlv[j]]),
+                        mvrmodel$training$Ypred[,i,j]),
                       ylim = range(mvrmodel$Y[,i],
-                        mvrmodel$training$Ypred[,i,nlv[j]]),
+                        mvrmodel$training$Ypred[,i,j]),
                       main=paste("Training data\n",nlv[j],"latent variables"))
                  if (npred > 1) mtext(ynames[i])
                  abline(0, 1, col="blue")
-                 points(mvrmodel$Y[,i], mvrmodel$training$Ypred[,i,nlv[j]])
+                 points(mvrmodel$Y[,i], mvrmodel$training$Ypred[,i,j])
                }
                
                if (show[2]) {
-                 plot(mvrmodel$Y[,i], mvrmodel$validat$Ypred[,i,nlv[j]],
+                 plot(mvrmodel$Y[,i], mvrmodel$validat$Ypred[,i,j],
                       xlab="Measured", ylab="Predicted", type="n",
                       xlim=range(mvrmodel$Y[,i],
-                        mvrmodel$validat$Ypred[,i,nlv[j]]),
+                        mvrmodel$validat$Ypred[,i,j]),
                       ylim=range(mvrmodel$Y[,i],
-                        mvrmodel$validat$Ypred[,i,nlv[j]]),
+                        mvrmodel$validat$Ypred[,i,j]),
                       main=paste("Cross-validation data\n",
                         nlv[j],"latent variables"))
                  if (npred > 1) mtext(ynames[i])
                  abline(0, 1, col="blue")
-                 points(mvrmodel$Y[,i], mvrmodel$validat$Ypred[,i,nlv[j]])
+                 points(mvrmodel$Y[,i], mvrmodel$validat$Ypred[,i,j])
                }
              }
            }

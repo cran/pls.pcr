@@ -14,6 +14,7 @@ simpls <- function(X, Y, ncomp, newX=NULL)
   QQ <- matrix(0, ncol=max(ncomp), nrow=npred)
   TT <- matrix(0, ncol=max(ncomp), nrow=nobj)
   VV <- matrix(0, ncol=max(ncomp), nrow=nvar)
+  UU <- matrix(0, ncol=max(ncomp), nrow=nobj)
   B <- array(0, c(dim(X)[2], dim(Y)[2], length(ncomp)))
 
   if (!is.null(newX))
@@ -42,9 +43,10 @@ simpls <- function(X, Y, ncomp, newX=NULL)
     PP[,a] <- pp
     QQ[,a] <- qq
     VV[,a] <- vv
+    UU[,a] <- uu
 
     if (!is.na(i <- match(a, ncomp))) {
-      B[ , , i] <- RR[,1:a,drop=FALSE] %*% t(QQ[,1:a,drop=FALSE])
+      B[ , , i] <- RR[, 1:a, drop=FALSE] %*% t(QQ[, 1:a, drop=FALSE])
       if (!is.null(newX))
         Ypred[ , , i] <- newX %*% B[ , , i]
     }
@@ -53,16 +55,17 @@ simpls <- function(X, Y, ncomp, newX=NULL)
   XvarExpl <- diag(crossprod(PP)) / (sum(diag(var(X))) * (nobj - 1))
 #  totalYvarExpl <- diag(crossprod(QQ)) / (sum(diag(var(Y))) * (nobj - 1))
   YvarExpl <- matrix(0, length(ncomp), npred)
-  for (i in 1:max(ncomp))
+  for (i in 1:length(ncomp))
     YvarExpl[i,] <- diag(cor(Y, X %*% B[ , , i]))^2
- # browser()
       
   if (!is.null(newX))
     list(B=B, XvarExpl=matrix(cumsum(XvarExpl)[ncomp], ncol=1),
-         YvarExpl=YvarExpl, Ypred=Ypred)
+         YvarExpl=YvarExpl, Ypred=Ypred, Xload=PP, Yload=QQ,
+         Xscores=TT, Yscores=UU)
   else
     list(B=B, XvarExpl=matrix(cumsum(XvarExpl)[ncomp], ncol=1),
-         YvarExpl=YvarExpl)
+         YvarExpl=YvarExpl, Xload=PP, Yload=QQ,
+         Xscores=TT, Yscores=UU)
 }
 
 

@@ -7,11 +7,21 @@ mvr <- function(X, Y, ncomp,
                 validation=c("none","CV"),
 	        grpsize, niter) 
 {
-  nobj <- dim(X)[1]
-  nvar <- dim(X)[2]
   if (is.vector(Y))
     Y <- matrix(Y, ncol=1)
+  if (!is.matrix(Y)) Y <- as.matrix(Y)
+  if (!is.matrix(X)) X <- as.matrix(X)
+  
+  nobj <- dim(X)[1]
+  nvar <- dim(X)[2]
   npred <- dim(Y)[2]
+  objnames <- dimnames(X)[[1]]
+  if (is.null(objnames)) objnames <- dimnames(Y)[[1]]
+  if (is.null(objnames)) objnames <- paste("obj", 1:nobj, sep=".")
+  xvarnames <- dimnames(X)[[2]]
+  if (is.null(xvarnames)) xvarnames <- paste("X", 1:nvar, sep=".")
+  yvarnames <- dimnames(Y)[[2]]
+  if (is.null(yvarnames)) yvarnames <- paste("Y", 1:npred, sep=".")
   
   validation <- match.arg(validation)
   if (validation == "CV") {
@@ -55,7 +65,7 @@ mvr <- function(X, Y, ncomp,
                 list(RMS = matrix(0, length(ncomp), npred),
                      R2 = matrix(0, length(ncomp), npred)))
   dimnames(training$RMS) <- dimnames(training$R2) <-
-    list(paste(ncomp, "LV's"), dimnames(Y)[[2]])
+    list(paste(ncomp, "LV's"), yvarnames)
   
   for (i in seq(along=ncomp)) {
     training$Ypred[ , , i] <-
@@ -68,8 +78,17 @@ mvr <- function(X, Y, ncomp,
 
   dimnames(training$XvarExpl) <- list(paste(ncomp, "LV's"), "X")
   dimnames(training$YvarExpl) <- list(paste(ncomp, "LV's"),
-                                      dimnames(Y)[[2]])
-
+                                      yvarnames)
+  dimnames(training$Xscores) <- list(objnames,
+                                     paste("LV", 1:max(ncomp)))
+  dimnames(training$Xload) <- list(xvarnames,
+                                   paste("LV", 1:max(ncomp)))
+  if (method != "PCR") {
+    dimnames(training$Yscores) <- list(objnames,
+                                       paste("LV", 1:max(ncomp)))
+    dimnames(training$Yload) <- list(yvarnames,
+                                     paste("LV", 1:max(ncomp)))
+  }
   mvrmodel <- list(X=X, Y=Y, ncomp=ncomp, training=training,
                    method=method)
   
@@ -79,7 +98,7 @@ mvr <- function(X, Y, ncomp,
                     RMS.sd = matrix(0, length(ncomp), npred),
                     R2 = matrix(0, length(ncomp), npred))
     dimnames(validat$RMS) <- dimnames(validat$R2) <-
-      list(paste(ncomp, "LV's"), dimnames(Y)[[2]])
+      list(paste(ncomp, "LV's"), yvarnames)
     
     Ypred <- array(0, c(nobj, npred, length(ncomp)))
     indices <- sample(1:nobj)

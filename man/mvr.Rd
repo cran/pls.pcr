@@ -55,7 +55,13 @@ pls(\dots, method)
     \item{XvarExpl}{Fraction of X-variance explained.}
     \item{YvarExpl}{Fraction of Y-variance explained (one column, even
       for multiple Y).
-      }
+    }
+    \item{Xscores}{X-scores for objects.}
+    \item{Xload}{X-loadings for objects.}
+    \item{Yscores}{Y-scores for objects: only in case of a PLS model
+      with more than one Y variable.}
+    \item{Yload}{Y-loadings for objects: only in case of a PLS model
+      with more than one Y variable.}
     }
     \item{validat}{a list with the following components:
       \item{Ypred}{predicted values.}
@@ -84,5 +90,12 @@ attach(NIR)
 NIR.pcr <- mvr(Xtrain, Ytrain, 1:6, validation="CV")
 NIR.simpls <- mvr(Xtrain, Ytrain, 1:6, validation="CV", method="SIMPLS")
 NIR.kernelpls <- mvr(Xtrain, Ytrain, 1:6, validation="CV", method="kernelPLS")
+
+data(sensory)
+Pn <- scale(sensory$Panel)
+Ql <- scale(sensory$Quality)
+sens.pcr <- mvr(Ql, Pn, 1:5)
+sens.simpls <- mvr(Ql, Pn, 1:5, method="SIMPLS")
+sens.kernelpls <- mvr(Ql, Pn, 1:5, method="kernelPLS")
 }
 \keyword{regression}

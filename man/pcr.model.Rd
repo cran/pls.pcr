@@ -9,7 +9,7 @@
 \arguments{
   \item{X}{a matrix of observations. \code{NA}s and \code{Inf}s are not
     allowed.} 
-  \item{Y}{a vector or matrix of responses. \code{NA}s and \code{Inf}s
+  \item{Y}{a matrix of responses. \code{NA}s and \code{Inf}s
     are not allowed.} 
   \item{ncomp}{the number of latent variables to be used in the
     modelling. The default number of latent variables is the smallest of
